@@ -4,6 +4,6 @@ resources:
 - gotk-components.yaml
 - gotk-sync.yaml
 - infrastructure.yaml
-- notification.yaml
-- image_sync.yaml
-- app.yaml
+# - notification.yaml
+# - image_sync.yaml
+# - app.yaml
