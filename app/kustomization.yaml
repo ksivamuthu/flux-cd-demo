@@ -3,3 +3,4 @@ kind: Kustomization
 namespace: default
 resources:
   - podinfo.yaml
+  - flagger-demo.yaml
