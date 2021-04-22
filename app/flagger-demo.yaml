@@ -63,7 +63,7 @@ spec:
         env:
         - name: PODINFO_UI_COLOR
           value: '#34577c'
-        image: stefanprodan/podinfo:3.1.0
+        image: ghcr.io/stefanprodan/podinfo:5.0.0 # {"$imagepolicy": "flux-system:podinfo"}
         imagePullPolicy: IfNotPresent
         livenessProbe:
           exec:
