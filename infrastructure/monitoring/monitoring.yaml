@@ -1,0 +1,13 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+kind: Kustomization
+metadata:
+  name: monitoring
+  namespace: monitoring
+spec:
+  interval: 5m
+  path: "./manifests/monitoring/"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: monitoring
+  timeout: 2m

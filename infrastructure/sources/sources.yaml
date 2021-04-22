@@ -8,3 +8,15 @@ spec:
   url: https://github.com/istio/istio
   ref:
     branch: master
+
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: monitoring
+  namespace: flux-system
+spec:
+  interval: 1m
+  url: https://github.com/fluxcd/flux2
+  ref:
+    branch: main
