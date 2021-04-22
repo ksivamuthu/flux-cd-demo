@@ -5,7 +5,8 @@ metadata:
   namespace: flux-system
 spec:
   type: discord
-  channel: general
+  channel: deployments
+  username: flux-demo-bot
   secretRef:
     name: discord-url
 ---
