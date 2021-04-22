@@ -7,12 +7,12 @@ spec:
   selector:
     istio: ingressgateway
   servers:
-    - port:
-        number: 80
-        name: http
-        protocol: HTTP
-      hosts:
-        - "*"
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
 ---
 apiVersion: v1
 kind: Namespace
@@ -63,7 +63,7 @@ spec:
         env:
         - name: PODINFO_UI_COLOR
           value: '#34577c'
-        image: ghcr.io/stefanprodan/podinfo:5.0.0 # {"$imagepolicy": "flux-system:podinfo"}
+        image: ghcr.io/stefanprodan/podinfo:5.0.3 # {"$imagepolicy": "flux-system:podinfo"}
         imagePullPolicy: IfNotPresent
         livenessProbe:
           exec:
@@ -101,6 +101,7 @@ spec:
           requests:
             cpu: 100m
             memory: 64Mi
+<<<<<<< HEAD
 ---              
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
@@ -209,6 +210,8 @@ spec:
         securityContext:
           readOnlyRootFilesystem: true
           runAsUser: 10001
+=======
+>>>>>>> 5c7b26bc4e0ef6abf3d9c8af0a3d73760624186d
 ---
 apiVersion: flagger.app/v1beta1
 kind: Canary
@@ -276,15 +279,15 @@ spec:
       interval: 30s
     # testing (optional)
     webhooks:
-      - name: acceptance-test
-        type: pre-rollout
-        url: http://flagger-loadtester.test/
-        timeout: 30s
-        metadata:
-          type: bash
-          cmd: "curl -sd 'test' http://podinfo-canary:9898/token | grep token"
-      - name: load-test
-        url: http://flagger-loadtester.test/
-        timeout: 5s
-        metadata:
-          cmd: "hey -z 1m -q 10 -c 2 http://podinfo-canary.test:9898/"
+    - name: acceptance-test
+      type: pre-rollout
+      url: http://flagger-loadtester.test/
+      timeout: 30s
+      metadata:
+        type: bash
+        cmd: "curl -sd 'test' http://podinfo-canary:9898/token | grep token"
+    - name: load-test
+      url: http://flagger-loadtester.test/
+      timeout: 5s
+      metadata:
+        cmd: "hey -z 1m -q 10 -c 2 http://podinfo-canary.test:9898/"
