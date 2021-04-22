@@ -5,3 +5,4 @@ resources:
   - istio 
   - monitoring
   - flagger
+  - namespace.yaml
