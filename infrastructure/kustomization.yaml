@@ -4,4 +4,4 @@ resources:
   - sources
   - istio 
   - monitoring
-  - flager
+  - flagger
