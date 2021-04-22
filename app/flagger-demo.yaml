@@ -14,13 +14,6 @@ spec:
       hosts:
         - "*"
 ---
-apiVersion: v1
-kind: Namespace
-metadata:
-  labels:
-    istio-injection: enabled
-  name: test
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -30,7 +23,6 @@ metadata:
   labels:
     app: podinfo
   name: podinfo
-  namespace: test
 spec:
   minReadySeconds: 5
   progressDeadlineSeconds: 60
@@ -63,7 +55,7 @@ spec:
         env:
         - name: PODINFO_UI_COLOR
           value: '#34577c'
-        image: ghcr.io/stefanprodan/podinfo:5.0.0 # {"$imagepolicy": "flux-system:podinfo"}
+        image: ghcr.io/stefanprodan/podinfo:3.1.0
         imagePullPolicy: IfNotPresent
         livenessProbe:
           exec:
@@ -109,7 +101,6 @@ metadata:
     kubectl.kubernetes.io/last-applied-configuration: |
       {"apiVersion":"autoscaling/v2beta2","kind":"HorizontalPodAutoscaler","metadata":{"annotations":{},"name":"podinfo","namespace":"test"},"spec":{"maxReplicas":4,"metrics":[{"resource":{"name":"cpu","target":{"averageUtilization":99,"type":"Utilization"}},"type":"Resource"}],"minReplicas":2,"scaleTargetRef":{"apiVersion":"apps/v1","kind":"Deployment","name":"podinfo"}}}
   name: podinfo
-  namespace: test
 spec:
   maxReplicas: 4
   metrics:
@@ -134,7 +125,6 @@ metadata:
   labels:
     app: flagger-loadtester
   name: flagger-loadtester
-  namespace: test
 spec:
   ports:
   - name: http
@@ -154,7 +144,6 @@ metadata:
   labels:
     app: flagger-loadtester
   name: flagger-loadtester
-  namespace: test
 spec:
   selector:
     matchLabels:
@@ -214,7 +203,6 @@ apiVersion: flagger.app/v1beta1
 kind: Canary
 metadata:
   name: podinfo
-  namespace: test
 spec:
   # deployment reference
   targetRef:
