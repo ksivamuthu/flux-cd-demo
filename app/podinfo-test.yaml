@@ -10,3 +10,4 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flagger-git
+    namespace: flux-system
