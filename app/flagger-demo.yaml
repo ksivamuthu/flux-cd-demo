@@ -1,0 +1,278 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: public-gateway
+  namespace: istio-system
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"podinfo"},"name":"podinfo","namespace":"test"},"spec":{"minReadySeconds":5,"progressDeadlineSeconds":60,"revisionHistoryLimit":5,"selector":{"matchLabels":{"app":"podinfo"}},"strategy":{"rollingUpdate":{"maxUnavailable":1},"type":"RollingUpdate"},"template":{"metadata":{"annotations":{"prometheus.io/port":"9797","prometheus.io/scrape":"true"},"labels":{"app":"podinfo"}},"spec":{"containers":[{"command":["./podinfo","--port=9898","--port-metrics=9797","--grpc-port=9999","--grpc-service-name=podinfo","--level=info","--random-delay=false","--random-error=false"],"env":[{"name":"PODINFO_UI_COLOR","value":"#34577c"}],"image":"stefanprodan/podinfo:3.1.0","imagePullPolicy":"IfNotPresent","livenessProbe":{"exec":{"command":["podcli","check","http","localhost:9898/healthz"]},"initialDelaySeconds":5,"timeoutSeconds":5},"name":"podinfod","ports":[{"containerPort":9898,"name":"http","protocol":"TCP"},{"containerPort":9797,"name":"http-metrics","protocol":"TCP"},{"containerPort":9999,"name":"grpc","protocol":"TCP"}],"readinessProbe":{"exec":{"command":["podcli","check","http","localhost:9898/readyz"]},"initialDelaySeconds":5,"timeoutSeconds":5},"resources":{"limits":{"cpu":"2000m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"64Mi"}}}]}}}}
+  labels:
+    app: podinfo
+  name: podinfo
+spec:
+  minReadySeconds: 5
+  progressDeadlineSeconds: 60
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: podinfo
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        prometheus.io/port: "9797"
+        prometheus.io/scrape: "true"
+      labels:
+        app: podinfo
+    spec:
+      containers:
+      - command:
+        - ./podinfo
+        - --port=9898
+        - --port-metrics=9797
+        - --grpc-port=9999
+        - --grpc-service-name=podinfo
+        - --level=info
+        - --random-delay=false
+        - --random-error=false
+        env:
+        - name: PODINFO_UI_COLOR
+          value: '#34577c'
+        image: ghcr.io/stefanprodan/podinfo:5.0.0
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          exec:
+            command:
+            - podcli
+            - check
+            - http
+            - localhost:9898/healthz
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+        name: podinfod
+        ports:
+        - containerPort: 9898
+          name: http
+          protocol: TCP
+        - containerPort: 9797
+          name: http-metrics
+          protocol: TCP
+        - containerPort: 9999
+          name: grpc
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command:
+            - podcli
+            - check
+            - http
+            - localhost:9898/readyz
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+        resources:
+          limits:
+            cpu: 2000m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 64Mi
+---              
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"autoscaling/v2beta2","kind":"HorizontalPodAutoscaler","metadata":{"annotations":{},"name":"podinfo","namespace":"test"},"spec":{"maxReplicas":4,"metrics":[{"resource":{"name":"cpu","target":{"averageUtilization":99,"type":"Utilization"}},"type":"Resource"}],"minReplicas":2,"scaleTargetRef":{"apiVersion":"apps/v1","kind":"Deployment","name":"podinfo"}}}
+  name: podinfo
+spec:
+  maxReplicas: 4
+  metrics:
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: 99
+        type: Utilization
+    type: Resource
+  minReplicas: 2
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: podinfo
+---    
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"app":"flagger-loadtester"},"name":"flagger-loadtester","namespace":"test"},"spec":{"ports":[{"name":"http","port":80,"protocol":"TCP","targetPort":"http"}],"selector":{"app":"flagger-loadtester"},"type":"ClusterIP"}}
+  labels:
+    app: flagger-loadtester
+  name: flagger-loadtester
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: http
+  selector:
+    app: flagger-loadtester
+  type: ClusterIP
+---  
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"flagger-loadtester"},"name":"flagger-loadtester","namespace":"test"},"spec":{"selector":{"matchLabels":{"app":"flagger-loadtester"}},"template":{"metadata":{"annotations":{"prometheus.io/port":"8080","prometheus.io/scrape":"true"},"labels":{"app":"flagger-loadtester"}},"spec":{"containers":[{"command":["./loadtester","-port=8080","-log-level=info","-timeout=1h"],"image":"ghcr.io/fluxcd/flagger-loadtester:0.18.0","imagePullPolicy":"IfNotPresent","livenessProbe":{"exec":{"command":["wget","--quiet","--tries=1","--timeout=4","--spider","http://localhost:8080/healthz"]},"timeoutSeconds":5},"name":"loadtester","ports":[{"containerPort":8080,"name":"http"}],"readinessProbe":{"exec":{"command":["wget","--quiet","--tries=1","--timeout=4","--spider","http://localhost:8080/healthz"]},"timeoutSeconds":5},"resources":{"limits":{"cpu":"1000m","memory":"512Mi"},"requests":{"cpu":"10m","memory":"32Mi"}},"securityContext":{"readOnlyRootFilesystem":true,"runAsUser":10001}}]}}}}
+  labels:
+    app: flagger-loadtester
+  name: flagger-loadtester
+spec:
+  selector:
+    matchLabels:
+      app: flagger-loadtester
+  template:
+    metadata:
+      annotations:
+        prometheus.io/port: "8080"
+        prometheus.io/scrape: "true"
+      labels:
+        app: flagger-loadtester
+    spec:
+      containers:
+      - command:
+        - ./loadtester
+        - -port=8080
+        - -log-level=info
+        - -timeout=1h
+        image: ghcr.io/fluxcd/flagger-loadtester:0.18.0
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          exec:
+            command:
+            - wget
+            - --quiet
+            - --tries=1
+            - --timeout=4
+            - --spider
+            - http://localhost:8080/healthz
+          timeoutSeconds: 5
+        name: loadtester
+        ports:
+        - containerPort: 8080
+          name: http
+        readinessProbe:
+          exec:
+            command:
+            - wget
+            - --quiet
+            - --tries=1
+            - --timeout=4
+            - --spider
+            - http://localhost:8080/healthz
+          timeoutSeconds: 5
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 512Mi
+          requests:
+            cpu: 10m
+            memory: 32Mi
+        securityContext:
+          readOnlyRootFilesystem: true
+          runAsUser: 10001
+---
+apiVersion: flagger.app/v1beta1
+kind: Canary
+metadata:
+  name: podinfo
+spec:
+  # deployment reference
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: podinfo
+  # the maximum time in seconds for the canary deployment
+  # to make progress before it is rollback (default 600s)
+  progressDeadlineSeconds: 60
+  # HPA reference (optional)
+  autoscalerRef:
+    apiVersion: autoscaling/v2beta2
+    kind: HorizontalPodAutoscaler
+    name: podinfo
+  service:
+    # service port number
+    port: 9898
+    # container port number or name (optional)
+    targetPort: 9898
+    # Istio gateways (optional)
+    gateways:
+    - public-gateway.istio-system.svc.cluster.local
+    # Istio virtual service host names (optional)
+    hosts:
+    - "*"
+    # Istio traffic policy (optional)
+    trafficPolicy:
+      tls:
+        # use ISTIO_MUTUAL when mTLS is enabled
+        mode: DISABLE
+    # Istio retry policy (optional)
+    retries:
+      attempts: 3
+      perTryTimeout: 1s
+      retryOn: "gateway-error,connect-failure,refused-stream"
+  analysis:
+    # schedule interval (default 60s)
+    interval: 1m
+    # max number of failed metric checks before rollback
+    threshold: 5
+    # max traffic percentage routed to canary
+    # percentage (0-100)
+    maxWeight: 50
+    # canary increment step
+    # percentage (0-100)
+    stepWeight: 10
+    metrics:
+    - name: request-success-rate
+      # minimum req success rate (non 5xx responses)
+      # percentage (0-100)
+      thresholdRange:
+        min: 99
+      interval: 1m
+    - name: request-duration
+      # maximum req duration P99
+      # milliseconds
+      thresholdRange:
+        max: 500
+      interval: 30s
+    # testing (optional)
+    # webhooks:
+    # - name: acceptance-test
+    #   type: pre-rollout
+    #   url: http://flagger-loadtester.test/
+    #   timeout: 30s
+    #   metadata:
+    #     type: bash
+    #     cmd: "curl -sd 'test' http://podinfo-canary:9898/token | grep token"
+    # - name: load-test
+    #   url: http://flagger-loadtester.test/
+    #   timeout: 5s
+    #   metadata:
+    #     cmd: "hey -z 1m -q 10 -c 2 http://podinfo-canary.test:9898/"

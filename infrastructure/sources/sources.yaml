@@ -8,7 +8,6 @@ spec:
   url: https://github.com/istio/istio
   ref:
     branch: master
-
 ---
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: GitRepository
@@ -20,3 +19,22 @@ spec:
   url: https://github.com/fluxcd/flux2
   ref:
     branch: main
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: HelmRepository
+metadata:
+  name: bitnami
+  namespace: flux-system
+spec:
+  interval: 10m
+  url: https://charts.bitnami.com/bitnami
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: HelmRepository
+metadata:
+  name: flagger
+  namespace: flux-system
+spec:
+  interval: 10m
+  url: https://flagger.app
+---
