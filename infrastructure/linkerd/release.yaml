@@ -1,0 +1,17 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: linkerd
+spec:
+  releaseName: linkerd
+  chart:
+    spec:
+      chart: linkerd
+      sourceRef:
+        kind: HelmRepository
+        name: linkerd
+        namespace: flux-system
+  interval: 1m0s
+  install:
+    remediation:
+      retries: 3
