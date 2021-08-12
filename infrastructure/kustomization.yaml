@@ -6,3 +6,4 @@ resources:
   - monitoring
   - flagger
   - namespace.yaml
+  - onetug.yaml
