@@ -47,3 +47,13 @@ spec:
   interval: 10m
   url: https://flagger.app
 ---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: flagger-git
+  namespace: flux-system
+spec:
+  interval: 5m
+  url: https://github.com/fluxcd/flagger/
+  ref:
+    branch: main
