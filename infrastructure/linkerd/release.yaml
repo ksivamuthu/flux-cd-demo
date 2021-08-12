@@ -3,7 +3,7 @@ kind: HelmRelease
 metadata:
   name: linkerd
 spec:
-  releaseName: linkerd
+  releaseName: linkerd2
   chart:
     spec:
       chart: linkerd
