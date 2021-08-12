@@ -3,4 +3,4 @@ kind: Kustomization
 namespace: linkerd
 resources:
   - namespace.yaml
-  - release.yaml
+  - linkerd.yaml
