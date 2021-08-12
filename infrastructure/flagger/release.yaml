@@ -16,5 +16,5 @@ spec:
     remediation:
       retries: 3
   values:
-    meshProvider: istio
+    meshProvider: linkerd
     metricsServer: http://prometheus.flux-system.svc.cluster.local:9090
