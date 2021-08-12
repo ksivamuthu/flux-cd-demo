@@ -6,7 +6,7 @@ spec:
   releaseName: linkerd2
   chart:
     spec:
-      chart: linkerd
+      chart: linkerd2
       sourceRef:
         kind: HelmRepository
         name: linkerd
