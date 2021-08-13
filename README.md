@@ -1,6 +1,6 @@
-# GitOps with Flux v2 & Flagger - AKS
+# [GitOps with Flux v2 & Flagger - AKS](https://bit.ly/flux-flagger-slide)
 
-Continuous Delivery and Progressive Delivery in Kubernetes
+Continuous Delivery and Progressive Delivery in Kubernetes. Slides are here https://bit.ly/flux-flagger-slide
 
 Orlando .NET User Group - Aug 12, 2021
 
