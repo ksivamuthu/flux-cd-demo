@@ -3,7 +3,7 @@ kind: Kustomization
 resources:
 - gotk-components.yaml
 - gotk-sync.yaml
-- infrastructure.yaml
 - notification.yaml
-- image_sync.yaml
+# - image_sync.yaml
+- infrastructure.yaml
 - app.yaml
