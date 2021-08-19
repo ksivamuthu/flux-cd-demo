@@ -4,13 +4,6 @@ metadata:
   name: podinfo-dev
   namespace: default
 spec:
-  minReadySeconds: 3
-  revisionHistoryLimit: 5
-  progressDeadlineSeconds: 60
-  strategy:
-    rollingUpdate:
-      maxUnavailable: 0
-    type: RollingUpdate
   selector:
     matchLabels:
       app: podinfo
@@ -24,7 +17,7 @@ spec:
     spec:
       containers:
       - name: podinfod
-        image: ghcr.io/stefanprodan/podinfo:5.0.3 # {"$imagepolicy": "flux-system:podinfo"}
+        image: ghcr.io/stefanprodan/podinfo:5.0.0 # {"$imagepolicy": "flux-system:podinfo"}
         imagePullPolicy: IfNotPresent
         ports:
         - name: http
