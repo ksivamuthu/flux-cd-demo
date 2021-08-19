@@ -6,4 +6,4 @@ resources:
   # - podinfo
   # - tester
   # - canary.yaml
-  # - podinfo.yaml
+  - podinfo.yaml
